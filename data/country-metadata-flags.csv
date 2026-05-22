@@ -1,0 +1,304 @@
+origin_iso,origin_name,origin_flag,originregion_name
+AFG,Afghanistan,🇦🇫,South Asia
+ALB,Albania,🇦🇱,Europe
+DZA,Algeria,🇩🇿,Africa
+ASM,American Samoa,🇦🇸,none
+AND,Andorra,🇦🇩,none
+AGO,Angola,🇦🇴,Africa
+AIA,Anguilla,🇦🇮,none
+ATA,Antarctica,🇦🇶,none
+ATG,Antigua and Barbuda,🇦🇬,none
+ATG,Antigua & Barbuda,🇦🇬,none
+ARG,Argentina,🇦🇷,Latin America
+ARM,Armenia,🇦🇲,Fmr Soviet Union
+ABW,Aruba,🇦🇼,Latin America
+AUS,Australia,🇦🇺,Oceania
+AUT,Austria,🇦🇹,Europe
+AZE,Azerbaijan,🇦🇿,Fmr Soviet Union
+BHS,Bahamas,🇧🇸,Latin America
+BHR,Bahrain,🇧🇭,West Asia
+BGD,Bangladesh,🇧🇩,South Asia
+BRB,Barbados,🇧🇧,Latin America
+BLR,Belarus,🇧🇾,Fmr Soviet Union
+BEL,Belgium,🇧🇪,Europe
+BLZ,Belize,🇧🇿,Latin America
+BEN,Benin,🇧🇯,Africa
+BMU,Bermuda,🇧🇲,none
+BTN,Bhutan,🇧🇹,South Asia
+BOL,Bolivia,🇧🇴,Latin America
+BOL,Bolivia (Plurinational State of),🇧🇴,Latin America
+BES,"Bonaire, Sint Eustatius and Saba",🇧🇶‍,none
+BIH,Bosnia and Herzegovina,🇧🇦,Europe
+BIH,Bosnia & Herzegovina,🇧🇦,Europe
+BWA,Botswana,🇧🇼,Africa
+BVT,Bouvet Island,🇧🇻,none
+BRA,Brazil,🇧🇷,Latin America
+IOT,British Indian Ocean Territory,🇮🇴,none
+BRN,Brunei Darussalam,🇧🇳,South-East Asia
+BRN,Brunei,🇧🇳,South-East Asia
+BGR,Bulgaria,🇧🇬,Europe
+BFA,Burkina Faso,🇧🇫,Africa
+BDI,Burundi,🇧🇮,Africa
+CPV,Cabo Verde,🇨🇻,Africa
+CPV,Cape Verde,🇨🇻,Africa
+KHM,Cambodia,🇰🇭,South-East Asia
+CMR,Cameroon,🇨🇲,Africa
+CAN,Canada,🇨🇦,North America
+CYM,Cayman Islands,🇰🇾,none
+CAF,Central African Republic,🇨🇫,Africa
+TCD,Chad,🇹🇩,Africa
+CHL,Chile,🇨🇱,Latin America
+CHI,Chile,🇨🇱,Latin America
+CHN,China,🇨🇳,East Asia
+CXR,Christmas Island,🇨🇽,none
+CCK,Cocos (Keeling Islands),🇨🇨,none
+COL,Colombia,🇨🇴,Latin America
+COM,Comoros,🇰🇲,Africa
+COD,Democratic Republic of the Congo,🇨🇩,Africa
+COD,DR Congo,🇨🇩,Africa
+COG,Congo,🇨🇬,Africa
+COK,Cook Islands,🇨🇰,none
+CRI,Costa Rica,🇨🇷,Latin America
+HRV,Croatia,🇭🇷,Europe
+CUB,Cuba,🇨🇺,Latin America
+CUW,Curaçao,🇨🇼,none
+CUW,Curacao,🇨🇼,none
+CYP,Cyprus,🇨🇾,West Asia
+CZE,Czechia,🇨🇿,Europe
+CIV,Côte d`Ivoire,🇨🇮,Africa
+CIV,Cote d'Ivoire,🇨🇮,Africa
+DNK,Denmark,🇩🇰,Europe
+DJI,Djibouti,🇩🇯,Africa
+DMA,Dominica,🇩🇲,none
+DOM,Dominican Republic,🇩🇴,Latin America
+ECU,Ecuador,🇪🇨,Latin America
+EGY,Egypt,🇪🇬,Africa
+SLV,El Salvador,🇸🇻,Latin America
+GNQ,Equatorial Guinea,🇬🇶,Africa
+ERI,Eritrea,🇪🇷,Africa
+EST,Estonia,🇪🇪,Fmr Soviet Union
+SWZ,Eswatini,🇸🇿,Africa
+ETH,Ethiopia,🇪🇹,Africa
+FLK,Falkland Islands,🇫🇰,none
+FLK,Falkland Islands (Malvinas),🇫🇰,none
+FRO,Faroe Islands,🇫🇴,none
+FJI,Fiji,🇫🇯,Oceania
+FIN,Finland,🇫🇮,Europe
+FRA,France,🇫🇷,Europe
+GUF,French Guiana,🇬🇫,Latin America
+PYF,French Polynesia,🇵🇫,Oceania
+ATF,French Southern Territories,🇹🇫,none
+GAB,Gabon,🇬🇦,Africa
+GMB,Gambia,🇬🇲,Africa
+GEO,Georgia,🇬🇪,Fmr Soviet Union
+DEU,Germany,🇩🇪,Europe
+GHA,Ghana,🇬🇭,Africa
+GIB,Gibraltar,🇬🇮,none
+GRC,Greece,🇬🇷,Europe
+GRL,Greenland,🇬🇱,none
+GRD,Grenada,🇬🇩,Latin America
+GLP,Guadeloupe,🇬🇵,Latin America
+GUM,Guam,🇬🇺,Oceania
+GTM,Guatemala,🇬🇹,Latin America
+GGY,Guernsey,🇬🇬,none
+GIN,Guinea,🇬🇳,Africa
+GNB,Guinea-Bissau,🇬🇼,Africa
+GUY,Guyana,🇬🇾,Latin America
+HTI,Haiti,🇭🇹,Latin America
+HMD,Heard Island and McDonald Islands,🇭🇲,none
+VAT,Holy See,🇻🇦,none
+HND,Honduras,🇭🇳,Latin America
+HKG,Hong Kong,🇭🇰,East Asia
+HKG,"China, Hong Kong SAR",🇭🇰,East Asia
+HKG,Hong Kong SAR,🇭🇰,East Asia
+HUN,Hungary,🇭🇺,Europe
+ISL,Iceland,🇮🇸,Europe
+IND,India,🇮🇳,South Asia
+IDN,Indonesia,🇮🇩,South-East Asia
+IRN,Iran,🇮🇷,South Asia
+IRN,Iran (Islamic Republic of),🇮🇷,South Asia
+IRQ,Iraq,🇮🇶,West Asia
+IRL,Ireland,🇮🇪,Europe
+IMN,Isle of Man,🇮🇲,none
+ISR,Israel,🇮🇱,West Asia
+ITA,Italy,🇮🇹,Europe
+JAM,Jamaica,🇯🇲,Latin America
+JPN,Japan,🇯🇵,East Asia
+JEY,Jersey,🇯🇪,none
+JEY,Channel Islands,🇯🇪,none
+JOR,Jordan,🇯🇴,West Asia
+KAZ,Kazakhstan,🇰🇿,Fmr Soviet Union
+KEN,Kenya,🇰🇪,Africa
+KIR,Kiribati,🇰🇮,none
+PRK,Democratic People`s Republic of Korea,🇰🇵,East Asia
+PRK,Dem. People's Republic of Korea,🇰🇵,East Asia
+PRK,North Korea,🇰🇵,East Asia
+KOR,South Korea,🇰🇷,East Asia
+KOR,Republic of Korea,🇰🇷,East Asia
+KWT,Kuwait,🇰🇼,West Asia
+KGZ,Kyrgyzstan,🇰🇬,Fmr Soviet Union
+LAO,People`s Democratic Republic of Lao,🇱🇦,South-East Asia
+LAO,Lao People's Democratic Republic,🇱🇦,South-East Asia
+LAO,Laos,🇱🇦,South-East Asia
+LVA,Latvia,🇱🇻,Fmr Soviet Union
+LBN,Lebanon,🇱🇧,West Asia
+LSO,Lesotho,🇱🇸,Africa
+LBR,Liberia,🇱🇷,Africa
+LBY,Libya,🇱🇾,Africa
+LIE,Liechtenstein,🇱🇮,none
+LTU,Lithuania,🇱🇹,Fmr Soviet Union
+LUX,Luxembourg,🇱🇺,Europe
+MAC,Macao,🇲🇴,East Asia
+MAC,Macao SAR,🇲🇴,East Asia
+MAC,"China, Macao SAR",🇲🇴,East Asia
+MDG,Madagascar,🇲🇬,Africa
+MWI,Malawi,🇲🇼,Africa
+MYS,Malaysia,🇲🇾,South-East Asia
+MDV,Maldives,🇲🇻,South Asia
+MLI,Mali,🇲🇱,Africa
+MLT,Malta,🇲🇹,Europe
+MHL,Marshall Islands,🇲🇭,none
+MTQ,Martinique,🇲🇶,Latin America
+MRT,Mauritania,🇲🇷,Africa
+MUS,Mauritius,🇲🇺,Africa
+MYT,Mayotte,🇾🇹,Africa
+MEX,Mexico,🇲🇽,Latin America
+FSM,Micronesia,🇫🇲,Oceania
+FSM,FS Micronesia,🇫🇲,Oceania
+FSM,Micronesia (Fed. States of),🇫🇲,Oceania
+MDA,Moldova,🇲🇩,Fmr Soviet Union
+MDA,Republic of Moldova,🇲🇩,Fmr Soviet Union
+MCO,Monaco,🇲🇨,Europe
+MNG,Mongolia,🇲🇳,East Asia
+MNE,Montenegro,🇲🇪,Europe
+MSR,Montserrat,🇲🇸,none
+MAR,Morocco,🇲🇦,Africa
+MOZ,Mozambique,🇲🇿,Africa
+MMR,Myanmar,🇲🇲,South-East Asia
+NAM,Namibia,🇳🇦,Africa
+NRU,Nauru,🇳🇷,none
+NPL,Nepal,🇳🇵,South Asia
+NLD,Netherlands,🇳🇱,Europe
+NCL,New Caledonia,🇳🇨,Oceania
+NZL,New Zealand,🇳🇿,Oceania
+NIC,Nicaragua,🇳🇮,Latin America
+NER,Niger,🇳🇪,Africa
+NGA,Nigeria,🇳🇬,Africa
+NIU,Niue,🇳🇺,none
+NFK,Norfolk Island,🇳🇫,none
+MNP,Northern Mariana Islands,🇲🇵,none
+NOR,Norway,🇳🇴,Europe
+OMN,Oman,🇴🇲,West Asia
+PAK,Pakistan,🇵🇰,South Asia
+PLW,Palau,🇵🇼,none
+PSE,"Palestine, State of",🇵🇸,West Asia
+PSE,"Palestine",🇵🇸,West Asia
+PSE,"State of Palestine",🇵🇸,West Asia
+PAN,Panama,🇵🇦,Latin America
+PNG,Papua New Guinea,🇵🇬,Oceania
+PRY,Paraguay,🇵🇾,Latin America
+PER,Peru,🇵🇪,Latin America
+PHL,Philippines,🇵🇭,South-East Asia
+PCN,Pitcairn,🇵🇳,none
+POL,Poland,🇵🇱,Europe
+PRT,Portugal,🇵🇹,Europe
+PRI,Puerto Rico,🇵🇷,Latin America
+QAT,Qatar,🇶🇦,West Asia
+MKD,Republic of North Macedonia,🇲🇰,Europe
+MKD,North Macedonia,🇲🇰,Europe
+ROU,Romania,🇷🇴,Europe
+RUS,Russian Federation,🇷🇺,Fmr Soviet Union
+RUS,Russia,🇷🇺,Fmr Soviet Union
+RWA,Rwanda,🇷🇼,Africa
+REU,Réunion,🇷🇪,Africa
+REU,Reunion,🇷🇪,Africa
+BLM,Saint Barthélemy,🇧🇱,none
+SHN,"Saint Helena, Ascension and Tristan da Cunha",🇹🇦,none
+SHN,"Saint Helena",🇹🇦,none
+SHN,"St. Helena",🇹🇦,none
+KNA,Saint Kitts and Nevis,🇰🇳,none
+KNA,St. Kitts & Nevis,🇰🇳,none
+LCA,Saint Lucia,🇱🇨,Latin America
+LCA,St. Lucia,🇱🇨,Latin America
+MAF,Saint Martin,🇲🇫,none
+SPM,Saint Pierre and Miquelon,🇵🇲,none
+SPM,St. Pierre & Miquelon,🇵🇲,none
+VCT,Saint Vincent and the Grenadines,🇻🇨,Latin America
+VCT,St. Vincent & Grenadines,🇻🇨,Latin America
+WSM,Samoa,🇼🇸,Oceania
+SMR,San Marino,🇸🇲,Europe
+STP,Sao Tome and Principe,🇸🇹,Africa
+STP,Sao Tome & Principe,🇸🇹,Africa
+SAU,Saudi Arabia,🇸🇦,West Asia
+SEN,Senegal,🇸🇳,Africa
+SRB,Serbia,🇷🇸,Europe
+SCG,Serbia and Montenegro,🇷🇸,Europe
+SCG,Serbia & Montenegro,🇷🇸,Europe
+SCG,Serbia and Montenegro (former),🇷🇸,Europe
+SYC,Seychelles,🇸🇨,none
+SLE,Sierra Leone,🇸🇱,Africa
+SGP,Singapore,🇸🇬,South-East Asia
+SXM,Sint Maarten,🇸🇽,none
+SVK,Slovakia,🇸🇰,Europe
+SVN,Slovenia,🇸🇮,Europe
+SLB,Solomon Islands,🇸🇧,Oceania
+SOM,Somalia,🇸🇴,Africa
+ZAF,South Africa,🇿🇦,Africa
+SGS,South Georgia and the South Sandwich Islands,🇬🇸,none
+SSD,South Sudan,🇸🇸,Africa
+ESP,Spain,🇪🇸,Europe
+LKA,Sri Lanka,🇱🇰,South Asia
+SDN,Sudan,🇸🇩,Africa
+SUD,Sudan,🇸🇩,Africa
+SUD,Sudan (former),🇸🇩,Africa
+SUD,Sudan*,🇸🇩,Africa
+SUR,Suriname,🇸🇷,Latin America
+SJM,Svalbard and Jan Mayen,🇸🇯,none
+SWE,Sweden,🇸🇪,Europe
+CHE,Switzerland,🇨🇭,Europe
+SYR,Syrian Arab Republic,🇸🇾,West Asia
+SYR,Syria,🇸🇾,West Asia
+TWN,Taiwan,🇹🇼,none
+TJK,Tajikistan,🇹🇯,Fmr Soviet Union
+TZA,United Republic of Tanzania,🇹🇿,Africa
+TZA,Tanzania,🇹🇿,Africa
+THA,Thailand,🇹🇭,South-East Asia
+TLS,Timor-Leste,🇹🇱,South-East Asia
+TGO,Togo,🇹🇬,Africa
+TKL,Tokelau,🇹🇰,none
+TON,Tonga,🇹🇴,Oceania
+TTO,Trinidad and Tobago,🇹🇹,Latin America
+TTO,Trinidad & Tobago,🇹🇹,Latin America
+TUN,Tunisia,🇹🇳,Africa
+TUR,Turkey,🇹🇷,West Asia
+TKM,Turkmenistan,🇹🇲,Fmr Soviet Union
+TCA,Turks and Caicos Islands,🇹🇨,none
+TCA,Turks & Caicos Islands,🇹🇨,none
+TUV,Tuvalu,🇹🇻,none
+UGA,Uganda,🇺🇬,Africa
+UKR,Ukraine,🇺🇦,Fmr Soviet Union
+ARE,United Arab Emirates,🇦🇪,West Asia
+GBR,United Kingdom of Great Britain and Northern Ireland,🇬🇧,Europe
+GBR,United Kingdom,🇬🇧,Europe
+UMI,United States Minor Outlying Islands,🇺🇲,none
+USA,United States of America,🇺🇸,North America
+USA,United States,🇺🇸,North America
+URY,Uruguay,🇺🇾,Latin America
+UZB,Uzbekistan,🇺🇿,Fmr Soviet Union
+VUT,Vanuatu,🇻🇺,Oceania
+VEN,Venezuela,🇻🇪,Latin America
+VEN,Venezuela (Bolivarian Republic of),🇻🇪,Latin America
+VNM,Viet Nam,🇻🇳,South-East Asia
+VNM,Vietnam,🇻🇳,South-East Asia
+VGB,British Virgin Islands,🇻🇬,none
+VIR,US Virgin Islands,🇻🇮,Latin America
+VIR,U.S. Virgin Islands,🇻🇮,Latin America
+VIR,United States Virgin Islands,🇻🇮,Latin America
+WLF,Wallis and Futuna,🇼🇫,none
+WLF,Wallis & Futuna,🇼🇫,none
+WLF,Wallis and Futuna Islands,🇼🇫,none
+ESH,Western Sahara,🇪🇭,Africa
+YEM,Yemen,🇾🇪,West Asia
+ZMB,Zambia,🇿🇲,Africa
+ZWE,Zimbabwe,🇿🇼,Africa
+ALA,Åland Islands,🇦🇽,none
