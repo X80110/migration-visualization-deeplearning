@@ -1,9 +1,13 @@
 #### Measure
-Migrant population data measure the number of persons by their country of birth or citizenship and their country of residence at a specific point in time, where the timing of the arrival of the migrants in their destination country is unknown. In the plot above we filter to show only migrant populations above 10,000 persons. 
+Migrant stock data represent the estimated total number of international migrants born in their country of origin who reside in a destination country at a specific point in time.
 
-#### Data
-Values are based on the [migrant population data](https://www.un.org/development/desa/pd/content/international-migrant-stock) published by the United Nations, which estimates counts of the foreign-born populations, by country of birth, for 235 countries. Data are primarily based on records from censuses, nationally representative surveys and population registers provided by national statistical institutes to the United Nations. Their records are then adjusted to include refugee statistics not included in the primary data sources and to align to the five-year time points using interpolation and extrapolations outlined in the [methodology](https://www.un.org/development/desa/pd/content/international-migrant-stock) documentation. In countries lacking data on place of birth, the United Nations use available information on the country of citizenship as a proxy for the birthplace of international migrants, equating international migrants with foreign citizens in these cases. 
-[Download]( https://www.un.org/development/desa/pd/content/international-migrant-stock)
+#### Data & Methodology
+
+Values are based on migration estimates generated using a deep learning model proposed by [Gaskin and Abel (2025)](link to come). The framework combines and reconciles multiple data sources, including [UN DESA migrant stocks](https://www.un.org/development/desa/pd/content/international-migrant-stock), bias-adjusted flow estimates derived from [Facebook data](https://www.pnas.org/doi/10.1073/pnas.2409418122), harmonised statistics from European countries via [QuantMig](https://www.quantmig.eu/), and official data from select nations. To improve estimation accuracy—particularly in data-poor countries with no prior migration data or official statistics—the neural network leverages a wide range of geographic, economic, cultural, and political covariates as predictive variables.
+
+To compare these annual results with longer-term five-year migration flow estimates based on demographic accounting models, visit the original [Global Migration Flows Explorer](https://global-migration.iiasa.ac.at/).
+
+Zenodo [Download](https://zenodo.org/records/15778301)  —  HuggingFace [Download](https://huggingface.co/datasets/ThGaskin/Migration_flows)
 
 #### Reference
-United Nations Department of Economic and Social Affairs Population Division (2020). [*International Migrant Stock 2020*](https://www.un.org/development/desa/pd/content/international-migrant-stock) (POP/DB/MIG/Stock/Rev.2020)
+Abel, G.J., Cohen, J.E. (2019). [Bilateral international migration flow estimates for 200 countries.](https://www.nature.com/articles/s41597-019-0089-3) *Sci Data* **6** 82

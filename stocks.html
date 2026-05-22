@@ -14,13 +14,13 @@
 
     <link href="styles.css" rel="stylesheet" media="all">
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BK5Y2N03LY"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NKKH9JPPM7"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
 
-        gtag('config', 'G-BK5Y2N03LY');
+        gtag('config', 'G-NKKH9JPPM7');
     </script>
     <title>Global Migration Data Explorer - Migrant Flows - Totals</title>
 </head>
@@ -43,15 +43,15 @@
                     <li>
                         Data
                         <div class='dropdown'>
-                            <p>Migrant<br>Flows</p>
+                            <!-- <p>Migrant<br>Flows</p> -->
                             <p class="dropdown-section">
-                                <a class='drop-link' href='index.html'>Totals</a>
+                                <a class='drop-link' style="width:100%" href='index.html'>Migrant <br> Flows</a>
                                 <!-- <a class='drop-link' href='flows_by_sex.html'>Sex-Specific</a> -->
                                 <!-- <a class='drop-link' href='flows_by_type.html'>by type</a> -->
 
-                            <p>Migrant<br>Populations</p>
+                                <!-- <p>Migrant<br>Populations</p> -->
                             <p class="dropdown-section">
-                                <a class='drop-link' href='stocks.html'>Totals</a>
+                                <a class='drop-link' style="width:100%" href='index.html'>Migrant Populations</a>
                                 <!-- <a class='drop-link' href='stocks_by_sex.html'>Sex-Specific</a> -->
 
                         </div>
@@ -247,11 +247,11 @@
                         <div>
                             <h2>Migration Data</h2>
                             <hr>
-                            <h4>Migrant <b>Flows</b></h4>
-                            <a class='drop-link' href='index.html'>Totals</a>
+                            <!-- <h4>Migrant <b>Flows</b></h4> -->
+                            <a class='drop-link' href='index.html'>Migrant Flows</a>
                             <!-- <a class='drop-link' href='flows_by_sex.html'>Sex-Specific</a> -->
-                            <h4>Migrant <b>Populations</b></h4>
-                            <a class='drop-link' href='stocks.html'>Totals</a>
+                            <!--  <h4>Migrant <b>Populations</b></h4> -->
+                            <a class='drop-link' href='stocks.html'>Migrant Populations</a>
                             <!-- <a class='drop-link' href='stocks_by_sex.html'>Sex-Specific</a> -->
                             <!-- <a class='drop-link' href='flows_by_type.html'>by type</a> -->
                         </div>
@@ -302,7 +302,7 @@
         <a
             href="http://creativecommons.org/licenses/by-nc/3.0/"><!-- <img vertical-align="middle"width="60px" src="static/by-nc.png"> --></a>
         <br>
-        <span class="version"> Version 1.0 (June 2023). </span>
+        <span class="version"> Version 1.0 (June 2026). </span>
 
     </footer>
 </body>
@@ -326,7 +326,7 @@
     const allMethods = ['deep_learning'];
     const allTypes = ['outward', 'transit', 'return'];
     const allSexes = ['male', 'female'].reverse();
-    let markdown_file = 'static/texts/flow-total-text.md';
+    let markdown_file = 'static/texts/stock-total-text.md';
 
     // ============================================================================
     // FILE PATH BUILDER
@@ -793,13 +793,14 @@
 
             // Add class to appropriate link
             const paths = fileName(config);
-            if (paths.json.includes("flow")) {
-                const el = document.querySelector("#markdown_text > p:nth-child(8) > a");
-                if (el) el.className = 'drop-link';
-            } else if (paths.json.includes("stock")) {
-                const el = document.getElementById("markdown_text").querySelectorAll('a')[2];
-                if (el) el.className = 'drop-link';
-            }
+
+            const links = document.querySelectorAll('#markdown_text a');
+
+            links.forEach(link => {
+                if (link.textContent.trim().includes('Download')) {
+                    link.classList.add('drop-link');
+                }
+            })
         } catch (error) {
             console.error("Failed to update markdown text:", error);
         }

@@ -1,12 +1,13 @@
 #### Measure
-Migrant flow data measure the number of persons migrating between an origin and destination country over a given period of time. In the plot above we filter to show only estimated migrant flows above X??? persons during each five-year period.
+Migrant flow data represent the estimated number of persons who migrate between an origin and a destination country during a given year.
 
-#### Data
-[METHOD]
+#### Data & Methodology
 
-Full details of the method are presented in [Abel and Cohen (2019)](https://www.nature.com/articles/s41597-019-0089-3), alongside five other methods, whose estimates can also be viewed above using the dropdown menu. [Validation exercises](https://www.nature.com/articles/s41597-019-0089-3#Sec13), based on comparisons to available migration flow data published by national statistical offices, show that estimates based on the closed demographic accounting framework perform consistently better than estimates from the four other estimation approaches.
+Values are based on migration estimates generated using a deep learning model proposed by [Gaskin and Abel (2025)](link to come). The framework combines and reconciles multiple data sources, including [UN DESA migrant stocks](https://www.un.org/development/desa/pd/content/international-migrant-stock), bias-adjusted flow estimates derived from [Facebook data](https://www.pnas.org/doi/10.1073/pnas.2409418122), harmonised statistics from European countries via [QuantMig](https://www.quantmig.eu/), and official data from select nations. To improve estimation accuracy—particularly in data-poor countries with no prior migration data or official statistics—the neural network leverages a wide range of geographic, economic, cultural, and political covariates as predictive variables.
 
-[Download](https://doi.org/10.6084/m9.figshare.7731233) 
+To compare these annual results with longer-term five-year migration flow estimates based on demographic accounting models, visit the original [Global Migration Flows Explorer](https://global-migration.iiasa.ac.at/).
+
+Zenodo [Download](https://zenodo.org/records/15778301)  —  HuggingFace [Download](https://huggingface.co/datasets/ThGaskin/Migration_flows)
 
 #### Reference
 Abel, G.J., Cohen, J.E. (2019). [Bilateral international migration flow estimates for 200 countries.](https://www.nature.com/articles/s41597-019-0089-3) *Sci Data* **6** 82
