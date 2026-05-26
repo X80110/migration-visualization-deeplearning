@@ -392,6 +392,27 @@ function drawCountries(ctx, world) {
     });
 }
 
+function getMainGeometry(feature) {
+    if (!feature || !feature.geometry) return null;
+    if (feature.geometry.type === "Polygon") {
+        return feature.geometry;
+    }
+    if (feature.geometry.type === "MultiPolygon") {
+        let maxArea = -1;
+        let largestPolygonCoords = null;
+        feature.geometry.coordinates.forEach(coords => {
+            const polyGeom = { type: "Polygon", coordinates: coords };
+            const area = d3.geoArea(polyGeom);
+            if (area > maxArea) {
+                maxArea = area;
+                largestPolygonCoords = coords;
+            }
+        });
+        return largestPolygonCoords ? { type: "Polygon", coordinates: largestPolygonCoords } : feature.geometry;
+    }
+    return feature.geometry;
+}
+
 function drawLabels(ctx, world) {
     let drawnBoxes = [];
 
@@ -423,10 +444,13 @@ function drawLabels(ctx, world) {
         const name = feature.properties.name;
         if (!name) return;
 
+        const mainGeom = getMainGeometry(feature);
+        const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
+
         let centroid, area;
         try {
-            centroid = path.centroid(feature);
-            area = path.area(feature);
+            centroid = path.centroid(tempFeature);
+            area = path.area(tempFeature);
         } catch (e) { return; }
 
         if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) return;
@@ -442,7 +466,7 @@ function drawLabels(ctx, world) {
             if (cNode && cNode.lonlat) {
                 geoCen = cNode.lonlat;
             } else {
-                geoCen = d3.geoCentroid(feature);
+                geoCen = d3.geoCentroid(tempFeature);
             }
             const center = [-currentRotate[0], -currentRotate[1]];
             const dist = d3.geoDistance(center, geoCen);
@@ -745,7 +769,9 @@ async function drawMap(prepared, rawData, config) {
         }
         if (!feature) continue;
 
-        const centroid = d3.geoCentroid(feature);
+        const mainGeom = getMainGeometry(feature);
+        const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
+        const centroid = d3.geoCentroid(tempFeature);
         const meta = getMetaFunc(name);
 
         countryNodes.push({
