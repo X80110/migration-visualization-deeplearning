@@ -239,7 +239,7 @@ function setSelectors(allYears) {
 
     const years = allYears.map(Number).sort((a, b) => a - b);
     const minYear = years[0];
-    const maxYear = years[years.length - 1];
+    const maxYear = 2023/* years[years.length - 1]; */
 
     slider.setAttribute("min", minYear);
     slider.setAttribute("max", maxYear);

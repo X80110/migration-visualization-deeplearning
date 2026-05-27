@@ -312,7 +312,9 @@ img:hover {
   margin: 0.5em auto;
 }
 
-.slider, .slider-stock, .range-slider {
+.slider,
+.slider-stock,
+.range-slider {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
@@ -325,7 +327,9 @@ img:hover {
   transition: opacity 0.2s, filter 0.2s;
 }
 
-.slider:hover, .slider-stock:hover, .range-slider:hover {
+.slider:hover,
+.slider-stock:hover,
+.range-slider:hover {
   opacity: 1;
 }
 
@@ -377,7 +381,8 @@ img:hover {
   background: #ffffff;
   border: 3px solid #4b7fb3;
   cursor: pointer;
-  margin-top: -6px; /* center thumb on 6px track */
+  margin-top: -6px;
+  /* center thumb on 6px track */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15), 0 0 2px rgba(0, 0, 0, 0.1);
   transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
@@ -433,9 +438,11 @@ img:hover {
   max-width: 550px;
   justify-content: space-between;
   margin-top: 4px;
-  padding: 0 8px; /* align with thumb track edges */
+  padding: 0 8px;
+  /* align with thumb track edges */
   box-sizing: border-box;
-  height: 32px; /* space for text labels below */
+  height: 32px;
+  /* space for text labels below */
 }
 
 .slidertick-col {
@@ -1138,7 +1145,8 @@ input:checked+.styled-slider:before {
 .map-overlay-panel {
   position: absolute;
   top: 15px;
-  left: 4.6em; /* Aligns with sticky menu and title */
+  left: 4.6em;
+  /* Aligns with sticky menu and title */
   z-index: 10;
   background: transparent;
   backdrop-filter: none;
@@ -1198,11 +1206,12 @@ input:checked+.styled-slider:before {
   padding: 2px 8px;
   font-size: 11px;
   border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   background: white;
   cursor: pointer;
   color: #444;
-  height: 22px; /* Fixed height for better alignment with sliders */
+  height: 22px;
+  /* Fixed height for better alignment with sliders */
   line-height: normal;
   display: flex;
   align-items: center;
@@ -1229,7 +1238,7 @@ input:checked+.styled-slider:before {
   width: 32px;
   height: 32px;
   background: white;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
   color: #555;
   font-weight: bold;
@@ -1245,7 +1254,7 @@ input:checked+.styled-slider:before {
   background: #f8f8f8;
   color: #000;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .map-zoom-ui button:active {
