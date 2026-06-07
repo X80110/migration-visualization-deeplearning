@@ -1045,11 +1045,14 @@ select {
   position: absolute;
   top: 0;
   left: 0;
-  width: 0;
+  width: 100%;
   height: 100%;
   z-index: 1000;
   pointer-events: none;
   overflow: visible;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .sticky-sentinel {
@@ -1061,34 +1064,100 @@ select {
 .sticky-menu {
   position: sticky;
   top: 10px;
-  left: 10px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  background: transparent;
-  padding: 15px;
-  box-shadow: none;
-  border-radius: 15px;
-  align-items: flex-start;
-  margin: 10px 10px 10px 4.6em;
-  border: 1px solid transparent;
-  width: max-content;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 6px 12px;
+  border-radius: 24px;
+  align-items: center;
+  margin: 10px auto;
+  width: auto;
+  min-width: 160px;
+  max-width: calc(100% - 20px);
   pointer-events: auto;
-  -webkit-transition: all 0.3s;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sticky-menu.expanded {
+  border-radius: 12px;
+  padding: 12px 18px;
 }
 
 .sticky-menu.is-stuck {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .sticky-menu .slider-container,
 .sticky-menu .toggle-container,
 .sticky-menu .reset-button-container {
   width: 100%;
+}
+
+/* Sticky Menu Collapsible styles */
+.sticky-menu-toggle-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  outline: none;
+  transition: color 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+
+.sticky-menu-toggle-btn:hover {
+  color: #598cae;
+}
+
+.sticky-menu-toggle-btn .toggle-icon {
+  font-size: 9px;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.sticky-menu-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out, margin-top 0.3s ease-out;
+  opacity: 0;
+  width: 100%;
+  margin-top: 0;
+}
+
+.sticky-menu-content-inner {
+  overflow: hidden;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px;
+}
+
+.sticky-menu.expanded .sticky-menu-content {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 12px;
+}
+
+.sticky-menu.expanded .sticky-menu-toggle-btn .toggle-icon {
+  transform: rotate(360deg);
 }
 
 .styled-switch {
