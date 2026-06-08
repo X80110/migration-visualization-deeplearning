@@ -237,17 +237,17 @@ function setSelectors(allYears) {
     const sliderticks = document.getElementById("sliderticks");
     if (!slider || !sliderticks) return;
 
+    const isStock = fileName(config).json.includes("stock");
+    const isFlow = !isStock;
     const years = allYears.map(Number).sort((a, b) => a - b);
     const minYear = years[0];
-    const maxYear = 2023/* years[years.length - 1]; */
+    const maxYear = isFlow ? 2023 : 2024
 
     slider.setAttribute("min", minYear);
     slider.setAttribute("max", maxYear);
     /* slider.setAttribute("value", +maxYear); */
     slider.setAttribute("step", 1);
 
-    const isStock = fileName(config).json.includes("stock");
-    const isFlow = !isStock;
 
     // Helper to refresh tick marks and headers on input change
     function updateTicks(selectedYear) {
