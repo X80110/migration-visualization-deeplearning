@@ -245,7 +245,7 @@ function setSelectors(allYears) {
 
     slider.setAttribute("min", minYear);
     slider.setAttribute("max", maxYear);
-    /* slider.setAttribute("value", +maxYear); */
+    slider.value = config.year || maxYear;
     slider.setAttribute("step", 1);
 
 
