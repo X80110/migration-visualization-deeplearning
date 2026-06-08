@@ -316,7 +316,7 @@ async function loadWorldData() {
     if (worldData) return worldData;
     try {
         console.log("Loading world map data...");
-        const topology = await d3.json("json/world-50m.json");
+        const topology = await d3.json("json/world-110m.json");
         console.log("Topology loaded:", topology);
         if (!topojson) {
             console.error("TopoJSON library not found!");
