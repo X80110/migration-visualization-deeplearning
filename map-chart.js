@@ -96,6 +96,16 @@ function zoomOutMap() {
     if (mapCanvas) d3.select(mapCanvas).transition().duration(300).call(mapZoomLogic.scaleBy, 1 / 1.3);
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function containsWholeWord(str, word) {
+    const escaped = escapeRegExp(word);
+    const regex = new RegExp('(?:^|[^a-zA-Z0-9])' + escaped + '(?:$|[^a-zA-Z0-9])', 'i');
+    return regex.test(str);
+}
+
 let hoveredCountryFeature = null;
 let getMetaFunc = null;
 let getRegionColorFunc = null;
@@ -727,7 +737,7 @@ async function drawMap(prepared, rawData, config) {
                 if (nameInTopo === "Congo" && n === "DR Congo") return false;
                 if (nameInTopo === "Guinea" && n === "Equatorial Guinea") return false;
                 if (nameInTopo === "Sudan" && n === "South Sudan") return false;
-                return lowerName.includes(lowerN) || lowerN.includes(lowerName);
+                return containsWholeWord(lowerName, lowerN) || containsWholeWord(lowerN, lowerName);
             });
         }
         if (matrixName) {
@@ -764,7 +774,7 @@ async function drawMap(prepared, rawData, config) {
                 if (!f.properties.name) return false;
                 const topoName = f.properties.name.toLowerCase();
                 const dataName = name.toLowerCase();
-                return topoName.includes(dataName) || dataName.includes(topoName);
+                return containsWholeWord(topoName, dataName) || containsWholeWord(dataName, topoName);
             });
         }
         if (!feature) continue;
