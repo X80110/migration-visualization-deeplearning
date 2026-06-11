@@ -7,6 +7,10 @@ let animationFrameId = null;
 let particles = [];
 let flowPaths = [];
 let worldData = null;
+let labelBoundingBoxes = [];
+let hoveredFlowData = [];
+let lastHoveredName = null;
+let globalMaxSingleFlow = 1;
 
 // Map Parameters Debug Config
 let mapParams = {
@@ -191,14 +195,24 @@ function handleMapMouseMove(evt) {
     const x = (evt.clientX - rect.left) * scaleX;
     const y = (evt.clientY - rect.top) * scaleY;
 
-    // Find if mouse is within any country path
-    // The most reliable way for d3 canvas maps is projection.invert
-    // but d3.geoContains is expensive to run in mousemove for all geometries.
-    // Instead we can use canvas isPointInPath if we recreate the path or just use projection.invert
-    const lonlat = projection.invert([x, y]);
+    // 1. Check if mouse is over any active country label bounding box first
     let found = null;
-    if (lonlat) {
-        found = worldData.features.find(f => d3.geoContains(f, lonlat));
+    if (labelBoundingBoxes) {
+        const matchedLabel = labelBoundingBoxes.find(lb => {
+            const b = lb.box;
+            return x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h;
+        });
+        if (matchedLabel) {
+            found = matchedLabel.feature;
+        }
+    }
+
+    // 2. Fall back to checking polygon containment
+    if (!found) {
+        const lonlat = projection.invert([x, y]);
+        if (lonlat) {
+            found = worldData.features.find(f => d3.geoContains(f, lonlat));
+        }
     }
 
     if (found !== hoveredCountryFeature) {
@@ -206,9 +220,11 @@ function handleMapMouseMove(evt) {
         if (found) {
             mapCanvas.style.cursor = 'pointer';
             showMapTooltip(evt, found);
+            updateHoveredFlows(found.properties.name);
         } else {
             mapCanvas.style.cursor = 'default';
             d3.select('body').select('div#tooltip').style("visibility", "hidden");
+            updateHoveredFlows(null);
         }
     } else if (found) {
         // move tooltip
@@ -221,6 +237,72 @@ function handleMapMouseMove(evt) {
 function handleMapMouseOut(evt) {
     hoveredCountryFeature = null;
     d3.select('body').select('div#tooltip').style("visibility", "hidden");
+    updateHoveredFlows(null);
+}
+
+function updateHoveredFlows(countryName) {
+    if (lastHoveredName === countryName) return;
+    lastHoveredName = countryName;
+    hoveredFlowData = [];
+
+    if (!countryName || !currentRawData) return;
+
+    const matrix = currentRawData.matrix.matrix;
+    const names = currentRawData.matrix.names;
+    const isRegion = createIsRegion(currentRawData.matrix);
+
+    const countryIdx = names.indexOf(countryName);
+    if (countryIdx === -1 || isRegion(countryName)) return;
+
+    const sourceNode = nodeMapGlobal.get(countryName);
+    if (!sourceNode) return;
+
+    // We can show all flows above 0 when hovered since it's restricted to a single country.
+    const hoverMinThreshold = 900;
+
+    for (let j = 0; j < names.length; j++) {
+        if (countryIdx === j || isRegion(names[j])) continue;
+        const otherNode = nodeMapGlobal.get(names[j]);
+        if (!otherNode) continue;
+
+        // 1. Outflow from hovered country to other country
+        const outflowVal = matrix[countryIdx][j];
+        if (outflowVal > hoverMinThreshold) {
+            const numParticles = Math.ceil((outflowVal / globalMaxSingleFlow) * mapParams.density) + 1;
+            const pArr = [];
+            for (let p = 0; p < numParticles; p++) {
+                pArr.push(new Particle(mapParams.speedBase + (outflowVal / globalMaxSingleFlow) * (mapParams.speedBase * 2), mapParams.size));
+            }
+            hoveredFlowData.push({
+                sourceName: countryName,
+                targetName: names[j],
+                sourceLonLat: sourceNode.lonlat,
+                targetLonLat: otherNode.lonlat,
+                color: getRegionColorFunc(sourceNode.region_name),
+                particles: pArr,
+                value: outflowVal
+            });
+        }
+
+        // 2. Inflow to hovered country from other country
+        const inflowVal = matrix[j][countryIdx];
+        if (inflowVal > hoverMinThreshold) {
+            const numParticles = Math.ceil((inflowVal / globalMaxSingleFlow) * mapParams.density) + 1;
+            const pArr = [];
+            for (let p = 0; p < numParticles; p++) {
+                pArr.push(new Particle(mapParams.speedBase + (inflowVal / globalMaxSingleFlow) * (mapParams.speedBase * 2), mapParams.size));
+            }
+            hoveredFlowData.push({
+                sourceName: names[j],
+                targetName: countryName,
+                sourceLonLat: otherNode.lonlat,
+                targetLonLat: sourceNode.lonlat,
+                color: getRegionColorFunc(otherNode.region_name),
+                particles: pArr,
+                value: inflowVal
+            });
+        }
+    }
 }
 
 // Particle class for animated dots
@@ -312,12 +394,19 @@ function getMapCanvas() {
     return mapCanvas;
 }
 
+let fallbackCentroids = null;
+
 async function loadWorldData() {
     if (worldData) return worldData;
     try {
-        console.log("Loading world map data...");
-        const topology = await d3.json("json/world-110m.json");
+        console.log("Loading world map data and fallback centroids...");
+        const [topology, fallbacks] = await Promise.all([
+            d3.json("json/world-50m-simplified-10.json"),
+            d3.json("json/fallback_centroids.json").catch(() => null)
+        ]);
+        fallbackCentroids = fallbacks;
         console.log("Topology loaded:", topology);
+        console.log("Fallback centroids loaded:", fallbackCentroids);
         if (!topojson) {
             console.error("TopoJSON library not found!");
             return null;
@@ -425,6 +514,7 @@ function getMainGeometry(feature) {
 
 function drawLabels(ctx, world) {
     let drawnBoxes = [];
+    labelBoundingBoxes = []; // Clear the global list
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -454,22 +544,29 @@ function drawLabels(ctx, world) {
         const name = feature.properties.name;
         if (!name) return;
 
-        const mainGeom = getMainGeometry(feature);
-        const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
-
         let centroid, area;
-        try {
-            centroid = path.centroid(tempFeature);
-            area = path.area(tempFeature);
-        } catch (e) { return; }
+        const cNode = nodeMapGlobal.get(name);
+
+        if (feature.geometry === null && cNode && cNode.lonlat) {
+            centroid = projection(cNode.lonlat);
+            area = 0;
+        } else {
+            const mainGeom = getMainGeometry(feature);
+            const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
+            try {
+                centroid = path.centroid(tempFeature);
+                area = path.area(tempFeature);
+            } catch (e) { return; }
+        }
 
         if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) return;
 
         // Base area threshold for non-highlighted (prevents clutter)
-        // Adjust threshold based on subjective visibility
-        if (!isHighlight && area < 800) return;
+        // Bypass threshold for small countries that are active in the matrix data
+        const isSmallActive = nodeMapGlobal.has(name) && area < 800;
+        if (!isHighlight && area < 800 && !isSmallActive) return;
 
-        // Orthographic backface cullingf
+        // Orthographic backface culling
         if (mapParams.projectionType === "geoOrthographic") {
             let geoCen = null;
             const cNode = nodeMapGlobal.get(name);
@@ -487,11 +584,13 @@ function drawLabels(ctx, world) {
         ctx.font = `${isHighlight ? "semibold" : "normal"} ${fontSize}px 'Jost', sans-serif`;
         const textWidth = ctx.measureText(name).width;
 
+        const yOffset = 1;
+
         // Padding for collision box
         const padding = 2;
         const box = {
             x: centroid[0] - textWidth / 2 - padding,
-            y: centroid[1] - fontSize / 2 - padding,
+            y: centroid[1] + yOffset - fontSize / 2 - padding,
             w: textWidth + padding * 2,
             h: fontSize + padding * 2
         };
@@ -502,16 +601,22 @@ function drawLabels(ctx, world) {
         // Store box to prevent future defaults from overlapping it
         drawnBoxes.push(box);
 
+        // Save to global label bounding boxes for mouse hovering
+        labelBoundingBoxes.push({
+            box: box,
+            feature: feature
+        });
+
         if (isHighlight) {
             ctx.lineWidth = 4;
             ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
-            ctx.strokeText(name, centroid[0], centroid[1] + 1);
+            ctx.strokeText(name, centroid[0], centroid[1] + yOffset);
 
             ctx.fillStyle = name === hoverName ? "#333333" : getNodeColor(name);
-            ctx.fillText(name, centroid[0], centroid[1] + 1);
+            ctx.fillText(name, centroid[0], centroid[1] + yOffset);
         } else {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-            ctx.fillText(name, centroid[0], centroid[1] + 1);
+            ctx.fillStyle = "rgba(0, 0, 0, 0.35)"; // Slightly darker than 0.2 for readability
+            ctx.fillText(name, centroid[0], centroid[1] + yOffset);
         }
     };
 
@@ -606,7 +711,8 @@ function animate() {
 
     // Recompute path shapes this frame
     flowPaths = [];
-    globalFlowData.forEach(flow => {
+    const activeFlowData = hoveredCountryFeature ? hoveredFlowData : globalFlowData;
+    activeFlowData.forEach(flow => {
         let pathAlpha = 1;
         if (mapParams.projectionType === "geoOrthographic") {
             let alphaSrc = getHorizonOcclusionAlpha(flow.sourceLonLat);
@@ -756,6 +862,7 @@ async function drawMap(prepared, rawData, config) {
             }
         }
     }
+    globalMaxSingleFlow = maxSingleFlow;
 
     // Clear previous data
     particles = [];
@@ -779,14 +886,20 @@ async function drawMap(prepared, rawData, config) {
         }
         if (!feature) continue;
 
-        const mainGeom = getMainGeometry(feature);
-        const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
-        const centroid = d3.geoCentroid(tempFeature);
+        let centroid;
+        if (feature.geometry === null && fallbackCentroids && fallbackCentroids[name]) {
+            centroid = fallbackCentroids[name];
+        } else {
+            const mainGeom = getMainGeometry(feature);
+            const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
+            centroid = d3.geoCentroid(tempFeature);
+        }
+
         const meta = getMetaFunc(name);
 
         countryNodes.push({
             name: name,
-            region_name: meta.region_name,
+            region_name: meta ? meta.region_name : "unknown",
             lonlat: centroid
         });
     }
@@ -837,6 +950,12 @@ async function drawMap(prepared, rawData, config) {
     }
 
     // console.log(`Created ${flowPaths.length} flow paths with ${particles.length} particles`);
+
+    // Reset hovered state and re-calculate active flows if a country is currently hovered
+    lastHoveredName = null;
+    if (hoveredCountryFeature && hoveredCountryFeature.properties.name) {
+        updateHoveredFlows(hoveredCountryFeature.properties.name);
+    }
 
     // Start animation
     animate();
