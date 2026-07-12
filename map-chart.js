@@ -12,6 +12,11 @@ let hoveredFlowData = [];
 let lastHoveredName = null;
 let globalMaxSingleFlow = 1;
 
+// Pre-computed per-feature metrics (populated once in loadWorldData)
+// Eliminates expensive path.centroid/path.area calls from the per-frame render loop
+let featureGeoAreaCache = new Map();     // name -> geographic area (steradians)
+let featureGeoCentroidCache = new Map(); // name -> [lon, lat]
+
 // Map Parameters Debug Config
 let mapParams = {
     density: 100,
@@ -61,8 +66,9 @@ function calculateDefaultProjection() {
 }
 
 let mapTransform = d3.zoomIdentity;
+let lastProjectionType = null; // Track projection changes for updateMap
 let mapZoomLogic = d3.zoom()
-    .scaleExtent([0.5, 8])
+    .scaleExtent([0.5, 5])
     .on("start", () => {
         isUserInteracting = true;
     })
@@ -76,7 +82,10 @@ let mapZoomLogic = d3.zoom()
                 }
             }
             lastZoomTransform = e.transform;
-            mapTransform = d3.zoomIdentity.translate(mapTransform.x, mapTransform.y).scale(e.transform.k);
+            // BUG FIX: Use e.transform.k for scale. For orthographic we track rotation
+            // separately via currentRotate, so x/y of mapTransform are unused for translation.
+            // Keep them at 0 to avoid stale accumulation.
+            mapTransform = d3.zoomIdentity.scale(e.transform.k);
         } else {
             mapTransform = e.transform;
         }
@@ -89,15 +98,16 @@ let mapZoomLogic = d3.zoom()
 function resetMapZoom() {
     currentRotate = [0, 0];
     lastZoomTransform = null;
+    mapTransform = d3.zoomIdentity; // Reset immediately so next frame uses correct scale
     if (mapCanvas) d3.select(mapCanvas).transition().duration(750).call(mapZoomLogic.transform, d3.zoomIdentity);
 }
 
 function zoomInMap() {
-    if (mapCanvas) d3.select(mapCanvas).transition().duration(300).call(mapZoomLogic.scaleBy, 1.3);
+    if (mapCanvas) d3.select(mapCanvas).transition().duration(300).call(mapZoomLogic.scaleBy, 1.2);
 }
 
 function zoomOutMap() {
-    if (mapCanvas) d3.select(mapCanvas).transition().duration(300).call(mapZoomLogic.scaleBy, 1 / 1.3);
+    if (mapCanvas) d3.select(mapCanvas).transition().duration(300).call(mapZoomLogic.scaleBy, 1 / 1.2);
 }
 
 function escapeRegExp(string) {
@@ -413,11 +423,33 @@ async function loadWorldData() {
         }
         worldData = topojson.feature(topology, topology.objects.countries);
         console.log("World features processed:", worldData);
+
+        // Pre-compute geographic centroids and areas once so the animation loop
+        // doesn't have to call the expensive path.centroid / path.area every frame.
+        precomputeFeatureMetrics(worldData);
+
         return worldData;
     } catch (error) {
         console.error("Failed to load world map data", error);
         return null;
     }
+}
+
+/**
+ * Computes geographic centroid and area for every feature once at load time.
+ * Results are cached in featureGeoCentroidCache / featureGeoAreaCache.
+ * This makes drawLabels O(1) per feature instead of O(vertices).
+ */
+function precomputeFeatureMetrics(world) {
+    if (!world || !world.features) return;
+    world.features.forEach(feature => {
+        const name = feature.properties && feature.properties.name;
+        if (!name || !feature.geometry) return;
+        try {
+            featureGeoAreaCache.set(name, d3.geoArea(feature));
+            featureGeoCentroidCache.set(name, d3.geoCentroid(feature));
+        } catch (e) { /* degenerate geometry – skip */ }
+    });
 }
 
 // Create curved path between two points
@@ -456,7 +488,27 @@ function drawCountries(ctx, world) {
         });
     }
 
+    // For flat projections at high zoom, many countries are off-screen.
+    // Use a margin around the canvas so large edge-touching countries are still drawn.
+    const isFlat = mapParams.projectionType !== "geoOrthographic";
+    const cullMargin = 300; // px – big enough to catch countries whose centroid is near-off but polygon edge is inside
+
     world.features.forEach(feature => {
+        // Viewport culling for flat projections: skip features whose geographic centroid
+        // projects well outside the canvas. This avoids generating enormous canvas paths
+        // for off-screen countries when zoomed in.
+        if (isFlat) {
+            const fname = feature.properties && feature.properties.name;
+            const geoCen = fname ? (featureGeoCentroidCache.get(fname) || null) : null;
+            if (geoCen) {
+                const p = projection(geoCen);
+                if (p && (
+                    p[0] < -cullMargin || p[0] > MAP_WIDTH + cullMargin ||
+                    p[1] < -cullMargin || p[1] > MAP_HEIGHT + cullMargin
+                )) return; // completely off-screen – skip
+            }
+        }
+
         ctx.beginPath();
         path.context(ctx)(feature);
 
@@ -544,22 +596,36 @@ function drawLabels(ctx, world) {
         const name = feature.properties.name;
         if (!name) return;
 
-        let centroid, area;
+        // ── FAST centroid: O(1) per feature per frame ────────────────────────────
+        // Priority: (1) nodeMapGlobal lonlat  (2) pre-computed geo centroid  (3) path.centroid fallback
+        // This replaces the expensive per-frame path.centroid(feature) call.
+        let centroid;
         const cNode = nodeMapGlobal.get(name);
+        const fastLonlat = (cNode && cNode.lonlat)
+            ? cNode.lonlat
+            : featureGeoCentroidCache.get(name);
 
-        if (feature.geometry === null && cNode && cNode.lonlat) {
-            centroid = projection(cNode.lonlat);
-            area = 0;
+        if (fastLonlat) {
+            centroid = projection(fastLonlat);
+        } else if (feature.geometry === null) {
+            return; // nothing to draw
         } else {
+            // Rare fallback for uncached features
             const mainGeom = getMainGeometry(feature);
             const tempFeature = mainGeom ? { ...feature, geometry: mainGeom } : feature;
-            try {
-                centroid = path.centroid(tempFeature);
-                area = path.area(tempFeature);
-            } catch (e) { return; }
+            try { centroid = path.centroid(tempFeature); } catch (e) { return; }
         }
 
         if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) return;
+
+        // ── FAST area: use geographic area × scale² instead of path.area() ──────
+        // path.area() re-projects every vertex every frame – very expensive.
+        // Geographic area (steradians) × scale² gives a good approximation in px².
+        const geoArea = featureGeoAreaCache.get(name) || 0;
+        const scl = baseScale * mapTransform.k;
+        // Empirical factor: at scale=280 a ~1M km² country ≈ 800 px² (our threshold)
+        // 1M km² ≈ 0.002 steradians, so 800 / (280² × 0.002) ≈ 5.1
+        const area = geoArea * scl * scl * 5;
 
         // Base area threshold for non-highlighted (prevents clutter)
         // Bypass threshold for small countries that are active in the matrix data
@@ -568,17 +634,17 @@ function drawLabels(ctx, world) {
 
         // Orthographic backface culling
         if (mapParams.projectionType === "geoOrthographic") {
-            let geoCen = null;
-            const cNode = nodeMapGlobal.get(name);
-            if (cNode && cNode.lonlat) {
-                geoCen = cNode.lonlat;
-            } else {
-                geoCen = d3.geoCentroid(tempFeature);
+            const geoCen = fastLonlat || (featureGeoCentroidCache.get(name));
+            if (geoCen) {
+                const center = [-currentRotate[0], -currentRotate[1]];
+                const dist = d3.geoDistance(center, geoCen);
+                if (dist > Math.PI / 2) return;
             }
-            const center = [-currentRotate[0], -currentRotate[1]];
-            const dist = d3.geoDistance(center, geoCen);
-            if (dist > Math.PI / 2) return;
         }
+
+        // Viewport culling: skip labels whose centroid is clearly off-screen
+        if (centroid[0] < -50 || centroid[0] > MAP_WIDTH + 50 ||
+            centroid[1] < -20 || centroid[1] > MAP_HEIGHT + 20) return;
 
         const fontSize = isHighlight ? 12 : 10;
         ctx.font = `${isHighlight ? "semibold" : "normal"} ${fontSize}px 'Jost', sans-serif`;
@@ -666,26 +732,36 @@ function drawFlowPaths(ctx) {
 function animate() {
     if (!mapContext) return;
 
+    // Schedule NEXT frame first so exceptions this frame don't kill the loop
+    animationFrameId = requestAnimationFrame(animate);
+
+    try {
     // Clearing background map
     mapContext.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+
+    // Guard: clamp scale to prevent degenerate values causing a freeze
+    const safeScale = Math.max(0.01, baseScale * mapTransform.k);
 
     if (mapParams.projectionType === "geoOrthographic") {
         if (!isUserInteracting) {
             currentRotate[0] += 0.15; // Auto rotate
         }
-        projection.scale(baseScale * mapTransform.k);
+        projection.scale(safeScale);
         projection.translate(baseTranslate);
-
         projection.rotate([currentRotate[0], currentRotate[1], 0]);
         if (projection.clipAngle) projection.clipAngle(90);
+        if (projection.clipExtent) projection.clipExtent(null); // clipAngle handles it
     } else {
-        projection.scale(baseScale * mapTransform.k);
+        projection.scale(safeScale);
         projection.translate([
             mapTransform.x + mapTransform.k * baseTranslate[0],
             mapTransform.y + mapTransform.k * baseTranslate[1]
         ]);
         projection.rotate([0, 0, 0]);
         if (projection.clipAngle) projection.clipAngle(null);
+        // Tell D3 to clip geometry to the canvas bounds – avoids enormous canvas path
+        // commands for off-screen features when zoomed in.
+        if (projection.clipExtent) projection.clipExtent([[0, 0], [MAP_WIDTH, MAP_HEIGHT]]);
     }
 
     // Draw base map
@@ -767,7 +843,10 @@ function animate() {
         drawLabels(mapContext, worldData);
     }
 
-    animationFrameId = requestAnimationFrame(animate);
+    } catch (err) {
+        console.warn("[map] animate() error – frame skipped:", err);
+    }
+    // NOTE: next rAF is already scheduled at the top of animate()
 }
 
 function stopAnimation() {
@@ -787,10 +866,16 @@ async function drawMap(prepared, rawData, config) {
     const canvas = getMapCanvas();
     if (!canvas) return;
 
-    calculateDefaultProjection();
+    // Only recalculate the default projection on first load.
+    // Subsequent calls (e.g. year/method changes) should NOT discard user's zoom.
+    if (lastProjectionType === null) {
+        calculateDefaultProjection();
+        lastProjectionType = mapParams.projectionType;
+    }
 
     // Stop any existing animation
     stopAnimation();
+
 
     // Get helper functions
     getMetaFunc = createGetMeta({ raw_data: rawData.matrix, metadata: rawData.metadata.flags });
@@ -962,11 +1047,19 @@ async function drawMap(prepared, rawData, config) {
 }
 
 function updateMap(prepared, rawData, config) {
-    // Only refresh projection if it changed in debug UI
-    if (d3[mapParams.projectionType]) {
+    // Only recalculate the base projection if the projection TYPE changed,
+    // not on every data update — otherwise we'd discard the user's zoom level.
+    const projectionChanged = lastProjectionType !== mapParams.projectionType;
+    if (projectionChanged && d3[mapParams.projectionType]) {
+        // Reset zoom state when switching projection types
+        mapTransform = d3.zoomIdentity;
+        currentRotate = [0, 0];
+        lastZoomTransform = null;
+        if (mapCanvas) d3.select(mapCanvas).call(mapZoomLogic.transform, d3.zoomIdentity);
         calculateDefaultProjection();
         projection = d3[mapParams.projectionType]().scale(baseScale).translate(baseTranslate);
         path.projection(projection);
+        lastProjectionType = mapParams.projectionType;
     }
 
     drawMap(prepared, rawData, config);
