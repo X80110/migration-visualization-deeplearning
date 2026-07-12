@@ -9,4 +9,4 @@ To compare these annual results with longer-term five-year migration flow estima
 Zenodo [Download](https://zenodo.org/records/15778301)  —  HuggingFace [Download](https://huggingface.co/datasets/ThGaskin/Migration_flows)
 
 #### Reference
-Gaskin, T., & Abel, G. J. (2026). [Deep learning four decades of human migration](https://www.nature.com/articles/s41586-026-10611-7). *Nature*. Advance online publication. [doi.org/10.1038/s41586-026-10611-7](https://doi.org/10.1038/s41586-026-10611-7)
+Gaskin, T., & Abel, G. J. (2026). [Deep learning four decades of human migration](https://www.nature.com/articles/s41586-026-10611-7). *Nature 655, 148–157 (2026)*. Advance online publication. [doi.org/10.1038/s41586-026-10611-7](https://doi.org/10.1038/s41586-026-10611-7)
