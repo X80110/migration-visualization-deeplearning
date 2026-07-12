@@ -17,6 +17,10 @@ let globalMaxSingleFlow = 1;
 let featureGeoAreaCache = new Map();     // name -> geographic area (steradians)
 let featureGeoCentroidCache = new Map(); // name -> [lon, lat]
 
+// Globe auto-spin speed — lerped each frame for a soft hover deceleration
+const GLOBE_BASE_SPIN = 0.15;   // degrees/frame at full speed
+let currentSpinSpeed = GLOBE_BASE_SPIN;
+
 // Map Parameters Debug Config
 let mapParams = {
     density: 100,
@@ -743,9 +747,11 @@ function animate() {
     const safeScale = Math.max(0.01, baseScale * mapTransform.k);
 
     if (mapParams.projectionType === "geoOrthographic") {
-        if (!isUserInteracting) {
-            currentRotate[0] += 0.15; // Auto rotate
-        }
+        // Target spin speed: 0 when a country is hovered, full speed otherwise.
+        // Lerp 8% per frame → ~0.3 s soft transition in both directions.
+        const targetSpin = (!isUserInteracting && !hoveredCountryFeature) ? GLOBE_BASE_SPIN : 0;
+        currentSpinSpeed += (targetSpin - currentSpinSpeed) * 0.08;
+        currentRotate[0] += currentSpinSpeed;
         projection.scale(safeScale);
         projection.translate(baseTranslate);
         projection.rotate([currentRotate[0], currentRotate[1], 0]);
