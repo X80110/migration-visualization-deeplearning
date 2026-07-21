@@ -43,7 +43,7 @@ let isUserInteracting = false;
 let currentRotate = [0, 0];
 let lastZoomTransform = null;
 
-let baseScale = 160;
+let baseScale = 280;
 let baseTranslate = [MAP_WIDTH / 2, MAP_HEIGHT / 2];
 
 function calculateDefaultProjection() {
@@ -410,6 +410,50 @@ function getMapCanvas() {
 
 let fallbackCentroids = null;
 
+function isRingValid(ring) {
+    if (!ring || ring.length < 4) return false;
+    // Check for at least 3 unique coordinates to ensure it's not a line/point
+    const uniquePoints = new Set(ring.map(p => `${p[0]},${p[1]}`));
+    return uniquePoints.size >= 3;
+}
+
+function cleanFeatureGeometry(feature) {
+    if (!feature || !feature.geometry) return feature;
+    const geometry = feature.geometry;
+
+    if (geometry.type === "Polygon") {
+        const cleanedCoordinates = geometry.coordinates.filter(isRingValid);
+        if (cleanedCoordinates.length === 0) {
+            return { ...feature, geometry: null };
+        }
+        return {
+            ...feature,
+            geometry: {
+                type: "Polygon",
+                coordinates: cleanedCoordinates
+            }
+        };
+    }
+
+    if (geometry.type === "MultiPolygon") {
+        const cleanedCoordinates = geometry.coordinates
+            .map(poly => poly.filter(isRingValid))
+            .filter(poly => poly.length > 0);
+        if (cleanedCoordinates.length === 0) {
+            return { ...feature, geometry: null };
+        }
+        return {
+            ...feature,
+            geometry: {
+                type: "MultiPolygon",
+                coordinates: cleanedCoordinates
+            }
+        };
+    }
+
+    return feature;
+}
+
 async function loadWorldData() {
     if (worldData) return worldData;
     try {
@@ -426,6 +470,13 @@ async function loadWorldData() {
             return null;
         }
         worldData = topojson.feature(topology, topology.objects.countries);
+        
+        // Clean all feature geometries to remove degenerate (zero-area) polygons
+        // that cause D3 projection/clipping glitches during globe rotation
+        if (worldData && worldData.features) {
+            worldData.features = worldData.features.map(cleanFeatureGeometry);
+        }
+        
         console.log("World features processed:", worldData);
 
         // Pre-compute geographic centroids and areas once so the animation loop
@@ -740,114 +791,114 @@ function animate() {
     animationFrameId = requestAnimationFrame(animate);
 
     try {
-    // Clearing background map
-    mapContext.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+        // Clearing background map
+        mapContext.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
-    // Guard: clamp scale to prevent degenerate values causing a freeze
-    const safeScale = Math.max(0.01, baseScale * mapTransform.k);
+        // Guard: clamp scale to prevent degenerate values causing a freeze
+        const safeScale = Math.max(0.01, baseScale * mapTransform.k);
 
-    if (mapParams.projectionType === "geoOrthographic") {
-        // Target spin speed: 0 when a country is hovered, full speed otherwise.
-        // Lerp 8% per frame → ~0.3 s soft transition in both directions.
-        const targetSpin = (!isUserInteracting && !hoveredCountryFeature) ? GLOBE_BASE_SPIN : 0;
-        currentSpinSpeed += (targetSpin - currentSpinSpeed) * 0.08;
-        currentRotate[0] += currentSpinSpeed;
-        projection.scale(safeScale);
-        projection.translate(baseTranslate);
-        projection.rotate([currentRotate[0], currentRotate[1], 0]);
-        if (projection.clipAngle) projection.clipAngle(90);
-        if (projection.clipExtent) projection.clipExtent(null); // clipAngle handles it
-    } else {
-        projection.scale(safeScale);
-        projection.translate([
-            mapTransform.x + mapTransform.k * baseTranslate[0],
-            mapTransform.y + mapTransform.k * baseTranslate[1]
-        ]);
-        projection.rotate([0, 0, 0]);
-        if (projection.clipAngle) projection.clipAngle(null);
-        // Tell D3 to clip geometry to the canvas bounds – avoids enormous canvas path
-        // commands for off-screen features when zoomed in.
-        if (projection.clipExtent) projection.clipExtent([[0, 0], [MAP_WIDTH, MAP_HEIGHT]]);
-    }
-
-    // Draw base map
-    if (worldData) {
         if (mapParams.projectionType === "geoOrthographic") {
-            mapContext.beginPath();
-            path.context(mapContext)({ type: "Sphere" });
-            mapContext.fillStyle = "#f4f4f4"; // Matches article background
-            mapContext.shadowColor = "rgba(0, 0, 0, 0.10)";
-            mapContext.shadowBlur = 30;
-            mapContext.shadowOffsetX = 0;
-            mapContext.shadowOffsetY = 8;
-            mapContext.fill();
-
-            // Reset shadow to avoid affecting lines and dots
-            mapContext.shadowColor = "transparent";
-            mapContext.shadowBlur = 0;
-            mapContext.shadowOffsetX = 0;
-            mapContext.shadowOffsetY = 0;
-        }
-        drawCountries(mapContext, worldData);
-    }
-
-    // Recompute path shapes this frame
-    flowPaths = [];
-    const activeFlowData = hoveredCountryFeature ? hoveredFlowData : globalFlowData;
-    activeFlowData.forEach(flow => {
-        let pathAlpha = 1;
-        if (mapParams.projectionType === "geoOrthographic") {
-            let alphaSrc = getHorizonOcclusionAlpha(flow.sourceLonLat);
-            let alphaDst = getHorizonOcclusionAlpha(flow.targetLonLat);
-            pathAlpha = Math.min(alphaSrc, alphaDst);
-            if (pathAlpha <= 0) return; // Completely occluded
+            // Target spin speed: 0 when a country is hovered, full speed otherwise.
+            // Lerp 8% per frame → ~0.3 s soft transition in both directions.
+            const targetSpin = (!isUserInteracting && !hoveredCountryFeature) ? GLOBE_BASE_SPIN : 0;
+            currentSpinSpeed += (targetSpin - currentSpinSpeed) * 0.08;
+            currentRotate[0] += currentSpinSpeed;
+            projection.scale(safeScale);
+            projection.translate(baseTranslate);
+            projection.rotate([currentRotate[0], currentRotate[1], 0]);
+            if (projection.clipAngle) projection.clipAngle(90);
+            if (projection.clipExtent) projection.clipExtent(null); // clipAngle handles it
+        } else {
+            projection.scale(safeScale);
+            projection.translate([
+                mapTransform.x + mapTransform.k * baseTranslate[0],
+                mapTransform.y + mapTransform.k * baseTranslate[1]
+            ]);
+            projection.rotate([0, 0, 0]);
+            if (projection.clipAngle) projection.clipAngle(null);
+            // Tell D3 to clip geometry to the canvas bounds – avoids enormous canvas path
+            // commands for off-screen features when zoomed in.
+            if (projection.clipExtent) projection.clipExtent([[0, 0], [MAP_WIDTH, MAP_HEIGHT]]);
         }
 
-        let pSrc = projection(flow.sourceLonLat);
-        let pDst = projection(flow.targetLonLat);
-        // pSrc/pDst are null if they are on back-face of orthographic
-        if (!pSrc || !pDst) return;
+        // Draw base map
+        if (worldData) {
+            if (mapParams.projectionType === "geoOrthographic") {
+                mapContext.beginPath();
+                path.context(mapContext)({ type: "Sphere" });
+                mapContext.fillStyle = "#f4f4f4"; // Matches article background
+                mapContext.shadowColor = "rgba(0, 0, 0, 0.10)";
+                mapContext.shadowBlur = 30;
+                mapContext.shadowOffsetX = 0;
+                mapContext.shadowOffsetY = 8;
+                mapContext.fill();
 
-        // Exclude lines trying to wrap around the whole globe (optional heuristic)
-        const dx = pDst[0] - pSrc[0];
-        const dy = pDst[1] - pSrc[1];
-        if (mapParams.projectionType !== "geoOrthographic" && Math.sqrt(dx * dx + dy * dy) > MAP_WIDTH * 0.8) return;
-
-        const pathData = createCurvedPath(
-            { x: pSrc[0], y: pSrc[1] },
-            { x: pDst[0], y: pDst[1] },
-            flow.color
-        );
-        pathData.sourceName = flow.sourceName;
-        pathData.targetName = flow.targetName;
-        pathData.particles = flow.particles;
-        pathData.alpha = pathAlpha;
-        flowPaths.push(pathData);
-
-    });
-
-    // Draw flow paths based on visible ones
-    drawFlowPaths(mapContext);
-    // Update and draw path-attached particles
-    flowPaths.forEach(pathData => {
-        if (hoveredCountryFeature) {
-            const hName = hoveredCountryFeature.properties.name;
-            if (pathData.sourceName !== hName && pathData.targetName !== hName) {
-                // Keep moving them so they don't pile up, but don't draw
-                pathData.particles.forEach(p => p.update());
-                return;
+                // Reset shadow to avoid affecting lines and dots
+                mapContext.shadowColor = "transparent";
+                mapContext.shadowBlur = 0;
+                mapContext.shadowOffsetX = 0;
+                mapContext.shadowOffsetY = 0;
             }
+            drawCountries(mapContext, worldData);
         }
-        pathData.particles.forEach(p => {
-            p.update();
-            p.draw(mapContext, pathData);
-        });
-    });
 
-    // Draw Labels on top
-    if (worldData) {
-        drawLabels(mapContext, worldData);
-    }
+        // Recompute path shapes this frame
+        flowPaths = [];
+        const activeFlowData = hoveredCountryFeature ? hoveredFlowData : globalFlowData;
+        activeFlowData.forEach(flow => {
+            let pathAlpha = 1;
+            if (mapParams.projectionType === "geoOrthographic") {
+                let alphaSrc = getHorizonOcclusionAlpha(flow.sourceLonLat);
+                let alphaDst = getHorizonOcclusionAlpha(flow.targetLonLat);
+                pathAlpha = Math.min(alphaSrc, alphaDst);
+                if (pathAlpha <= 0) return; // Completely occluded
+            }
+
+            let pSrc = projection(flow.sourceLonLat);
+            let pDst = projection(flow.targetLonLat);
+            // pSrc/pDst are null if they are on back-face of orthographic
+            if (!pSrc || !pDst) return;
+
+            // Exclude lines trying to wrap around the whole globe (optional heuristic)
+            const dx = pDst[0] - pSrc[0];
+            const dy = pDst[1] - pSrc[1];
+            if (mapParams.projectionType !== "geoOrthographic" && Math.sqrt(dx * dx + dy * dy) > MAP_WIDTH * 0.8) return;
+
+            const pathData = createCurvedPath(
+                { x: pSrc[0], y: pSrc[1] },
+                { x: pDst[0], y: pDst[1] },
+                flow.color
+            );
+            pathData.sourceName = flow.sourceName;
+            pathData.targetName = flow.targetName;
+            pathData.particles = flow.particles;
+            pathData.alpha = pathAlpha;
+            flowPaths.push(pathData);
+
+        });
+
+        // Draw flow paths based on visible ones
+        drawFlowPaths(mapContext);
+        // Update and draw path-attached particles
+        flowPaths.forEach(pathData => {
+            if (hoveredCountryFeature) {
+                const hName = hoveredCountryFeature.properties.name;
+                if (pathData.sourceName !== hName && pathData.targetName !== hName) {
+                    // Keep moving them so they don't pile up, but don't draw
+                    pathData.particles.forEach(p => p.update());
+                    return;
+                }
+            }
+            pathData.particles.forEach(p => {
+                p.update();
+                p.draw(mapContext, pathData);
+            });
+        });
+
+        // Draw Labels on top
+        if (worldData) {
+            drawLabels(mapContext, worldData);
+        }
 
     } catch (err) {
         console.warn("[map] animate() error – frame skipped:", err);
