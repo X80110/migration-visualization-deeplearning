@@ -382,9 +382,9 @@ function setData(sankeyData, commonData, specificRawData, metadataCsv, config, c
             .duration(50)
             .style('background-color', '#ffffff')
             .style('padding', '1em')
-            .style("top", (evt.pageY + 20) + "px")
-            .style("left", (evt.pageX + 30) + "px")
             .style('visibility', 'visible');
+
+        positionTooltip(evt, tooltip.node());
     }
 
     function tooltipRegion(evt, d) {
@@ -413,9 +413,9 @@ function setData(sankeyData, commonData, specificRawData, metadataCsv, config, c
         tooltip
             .html(htmlContent)
             .style('background-color', isRegion(d.name) ? getRegionColor(d.name) : colorCountries(d.name))
-            .style("top", (evt.pageY + 20) + "px")
-            .style("left", (evt.pageX + 30) + "px")
             .style("visibility", "visible");
+
+        positionTooltip(evt, tooltip.node());
     }
 
     linkEnter

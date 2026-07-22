@@ -193,9 +193,9 @@ function showMapTooltip(evt, feature) {
     tooltip
         .html(`${sourceDisplay}<br>${labels.out}: <b>${outflowDisplay}</b><br>${labels.in}: <b>${inflowDisplay}</b>`)
         .style('background-color', '#ffffff')
-        .style("top", (evt.pageY + 20) + "px")
-        .style("left", (evt.pageX + 30) + "px")
         .style("visibility", "visible");
+
+    positionTooltip(evt, tooltip.node());
 }
 
 function handleMapMouseMove(evt) {
@@ -242,9 +242,7 @@ function handleMapMouseMove(evt) {
         }
     } else if (found) {
         // move tooltip
-        d3.select('body').select('div#tooltip')
-            .style("top", (evt.pageY + 20) + "px")
-            .style("left", (evt.pageX + 30) + "px");
+        positionTooltip(evt, d3.select('body').select('div#tooltip').node());
     }
 }
 

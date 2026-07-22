@@ -697,9 +697,9 @@ function drawChords(chordData, commonData, specificRawData, metadataCsv, config,
         tooltip
             .html(`<b>${sourceDisplay}</b> ${valueDisplay} ${targetDisplay}`)
             .style('background-color', '#ffffff')
-            .style("top", (evt.pageY + 20) + "px")
-            .style("left", (evt.pageX + 30) + "px")
             .style("visibility", "visible");
+
+        positionTooltip(evt, tooltip.node());
     }
 
     function tooltipRegion(evt, d_group) {
@@ -722,9 +722,9 @@ function drawChords(chordData, commonData, specificRawData, metadataCsv, config,
         tooltip
             .html(`${sourceDisplay}<br>${labels.out}: <b>${outflowDisplay}</b><br>${labels.in}: <b>${inflowDisplay}</b>`)
             .style('background-color', isRegion(d_group.name) ? getRegionColor(d_group.name) : colorCountries(d_group.name))
-            .style("top", (evt.pageY + 20) + "px")
-            .style("left", (evt.pageX + 30) + "px")
             .style("visibility", "visible");
+
+        positionTooltip(evt, tooltip.node());
     }
 
     // ========== INTERACTIONS ==========

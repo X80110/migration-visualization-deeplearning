@@ -963,8 +963,44 @@ async function dataPrepare(input, config) {
         // Set of region names that were removed because they had no country-level
         // links in the current filter window.  The caller checks this to
         // automatically collapse any expanded region that became hollow.
-        hollowRegions: _hollowRegions
     };
 
 
+}
+
+// Global helper to position tooltips safely within viewport bounds (especially on mobile/right edge)
+function positionTooltip(evt, tooltipEl) {
+    if (!tooltipEl) return;
+
+    const mouseX = evt.pageX;
+    const mouseY = evt.pageY;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Use a robust fallback for dimensions if element is not fully laid out yet
+    const tooltipWidth = tooltipEl.offsetWidth || 220;
+    const tooltipHeight = tooltipEl.offsetHeight || 100;
+
+    let left = mouseX + 15;
+    if (left + tooltipWidth > viewportWidth + scrollX) {
+        left = mouseX - tooltipWidth - 15;
+    }
+    if (left < scrollX + 5) {
+        left = scrollX + 5;
+    }
+
+    let top = mouseY + 15;
+    if (top + tooltipHeight > viewportHeight + scrollY) {
+        top = mouseY - tooltipHeight - 15;
+    }
+    if (top < scrollY + 5) {
+        top = scrollY + 5;
+    }
+
+    tooltipEl.style.left = left + "px";
+    tooltipEl.style.top = top + "px";
 }
