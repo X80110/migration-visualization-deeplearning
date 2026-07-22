@@ -734,6 +734,12 @@ img:hover {
   }
 
   ul.menu li:hover>.dropdown {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(5px);
+  }
+
+  ul.menu li.active-dropdown>.dropdown {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
@@ -770,6 +776,10 @@ img:hover {
   #chord {
     padding-top: 4em;
     transform: scale(1.3);
+  }
+
+  .selectors {
+    margin: 0;
   }
 
   .sticky-menu {
