@@ -873,9 +873,73 @@
             observer.observe(sentinel);
         }
 
-        // Close options menus on clicking outside
+        // Mobile hamburger menu behavior
+        const menuItems = document.querySelectorAll('ul.menu > li');
+        menuItems.forEach(li => {
+            const dropdown = li.querySelector('.dropdown');
+            if (dropdown) {
+                li.addEventListener('click', function (event) {
+                    // Only apply JS behavior on mobile (screen width <= 892px)
+                    if (window.innerWidth <= 892) {
+                        // Let standard links inside the dropdown be clickable normally
+                        if (event.target.closest('.dropdown a') || event.target.closest('.dropdown button')) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        event.stopPropagation(); // Prevents bubbling up to document click listener
+
+                        const isAlreadyActive = li.classList.contains('active-dropdown');
+
+                        // Close all other dropdowns
+                        menuItems.forEach(item => item.classList.remove('active-dropdown'));
+
+                        if (!isAlreadyActive) {
+                            li.classList.add('active-dropdown');
+                        }
+                    }
+                });
+            }
+        });
+
+        const menuBtn = document.getElementById('menu-btn');
+        if (menuBtn) {
+            menuBtn.addEventListener('change', function () {
+                if (!menuBtn.checked) {
+                    // Reset all dropdowns when menu is closed
+                    const currentMenuItems = document.querySelectorAll('ul.menu > li');
+                    currentMenuItems.forEach(item => item.classList.remove('active-dropdown'));
+                }
+            });
+        }
+
+        // Close options menus and hamburger menu on clicking outside/selecting
         document.addEventListener('click', function (event) {
-            // 1. Sticky menu click outside
+            // 1. Mobile hamburger menu click outside / link selection
+            if (window.innerWidth <= 892) {
+                // If clicking a link in the menu, close it
+                if (event.target.closest('ul.menu a')) {
+                    const mainMenuBtn = document.getElementById('menu-btn');
+                    if (mainMenuBtn && mainMenuBtn.checked) {
+                        mainMenuBtn.checked = false;
+                        const currentMenuItems = document.querySelectorAll('ul.menu > li');
+                        currentMenuItems.forEach(item => item.classList.remove('active-dropdown'));
+                    }
+                } else {
+                    // If clicking completely outside the header, close it
+                    const header = document.querySelector('.header');
+                    if (header && !header.contains(event.target)) {
+                        const mainMenuBtn = document.getElementById('menu-btn');
+                        if (mainMenuBtn && mainMenuBtn.checked) {
+                            mainMenuBtn.checked = false;
+                            const currentMenuItems = document.querySelectorAll('ul.menu > li');
+                            currentMenuItems.forEach(item => item.classList.remove('active-dropdown'));
+                        }
+                    }
+                }
+            }
+
+            // 2. Sticky menu click outside
             const currentStickyMenu = document.querySelector('.sticky-menu');
             if (currentStickyMenu && currentStickyMenu.classList.contains('expanded')) {
                 if (!currentStickyMenu.contains(event.target)) {
@@ -886,7 +950,7 @@
                 }
             }
 
-            // 2. Map overlay panel click outside
+            // 3. Map overlay panel click outside
             const mapPanel = document.querySelector('.map-overlay-panel');
             if (mapPanel && mapPanel.classList.contains('expanded')) {
                 if (!mapPanel.contains(event.target)) {
