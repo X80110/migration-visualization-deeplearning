@@ -894,6 +894,31 @@
 			);
 			observer.observe(sentinel);
 		}
+
+		// Close options menus on clicking outside
+		document.addEventListener('click', function (event) {
+			// 1. Sticky menu click outside
+			const currentStickyMenu = document.querySelector('.sticky-menu');
+			if (currentStickyMenu && currentStickyMenu.classList.contains('expanded')) {
+				if (!currentStickyMenu.contains(event.target)) {
+					const toggleBtn = currentStickyMenu.querySelector('.sticky-menu-toggle-btn');
+					if (toggleBtn) {
+						toggleStickyMenu(toggleBtn);
+					}
+				}
+			}
+
+			// 2. Map overlay panel click outside
+			const mapPanel = document.querySelector('.map-overlay-panel');
+			if (mapPanel && mapPanel.classList.contains('expanded')) {
+				if (!mapPanel.contains(event.target)) {
+					const toggleBtn = mapPanel.querySelector('.map-panel-toggle-btn');
+					if (toggleBtn) {
+						toggleMapPanel(toggleBtn);
+					}
+				}
+			}
+		});
 	});
 </script>
 

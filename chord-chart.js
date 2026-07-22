@@ -787,7 +787,6 @@ function drawChords(chordData, commonData, specificRawData, metadataCsv, config,
 
     // Click interactions
     groupsMerged.on('click', function (evt, d) {
-        evt.stopPropagation();
 
         if (d.id === d.region) {
             // Clicking a region - expand it

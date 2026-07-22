@@ -1343,8 +1343,8 @@ input:checked+.styled-slider:before {
 .map-overlay-panel {
   position: absolute;
   top: 15px;
-  left: 4.6em;
-  /* Aligns with sticky menu and title */
+  left: 15px;
+  /* Aligns with the same lateral margin as the zoom buttons */
   z-index: 10;
   background: rgba(255, 255, 255, 0.55);
   -webkit-backdrop-filter: blur(8px);
