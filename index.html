@@ -585,6 +585,15 @@
 		const currentVizEl = document.getElementById(selectedViz);
 		if (currentVizEl) currentVizEl.style.display = '';
 
+		// Hide scale toggle container for Sankey
+		const scaleToggle = document.getElementById('scale-toggle');
+		if (scaleToggle) {
+			const toggleContainer = scaleToggle.closest('.toggle-container');
+			if (toggleContainer) {
+				toggleContainer.style.display = (selectedViz === 'sankey') ? 'none' : 'flex';
+			}
+		}
+
 		// Update config
 		config.currentViz = selectedViz;
 		config.regions = []; // Reset regions when switching
