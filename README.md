@@ -1,4 +1,4 @@
-# Global Migration Data Explorer
+# Global Annual Migration Data Explorer
 
 #### Data & Methodology
 Values are based on migration estimates generated using a deep learning model proposed by [Gaskin and Abel (2025)](https://www.nature.com/articles/s41586-026-10611-7). The framework combines and reconciles multiple data sources, including [UN DESA migrant stocks](https://www.un.org/development/desa/pd/content/international-migrant-stock), bias-adjusted flow estimates derived from [Facebook data](https://www.pnas.org/doi/10.1073/pnas.2409418122), harmonised statistics from European countries via [QuantMig](https://www.quantmig.eu/), and official data from select nations. To improve estimation accuracy—particularly in data-poor countries with no prior migration data or official statistics—the neural network leverages a wide range of geographic, economic, cultural, and political covariates as predictive variables.
